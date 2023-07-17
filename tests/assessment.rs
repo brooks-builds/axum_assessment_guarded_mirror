@@ -1,3 +1,4 @@
+use axum_assessment_guarded_mirror::types::{CodingEditorRequest, CodingEditorType};
 use eyre::Result;
 use reqwest::Client;
 
@@ -8,25 +9,33 @@ async fn mirrors_validated_json() -> Result<()> {
     let url = format!("{BASE_URL}/mirror");
     let client = Client::new();
     let coding_editor = CodingEditorRequest {
-        name: "Helix".to_owned(),
-        editor_type: CodingEditorType::TUI,
-        rating: 5,
-        installed: true,
+        name: Some("Helix".to_owned()),
+        editor_type: Some(CodingEditorType::TUI),
+        rating: Some(5),
+        installed: Some(true),
     };
     let response = client.post(url).json(&coding_editor).send().await?;
+    let status = response.status();
+    let expected_status = 200;
+
+    assert_eq!(status, expected_status);
+
+    let response_coding_editor = response.json::<CodingEditorRequest>().await?;
+
+    assert_eq!(response_coding_editor, coding_editor);
+
     Ok(())
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
-struct CodingEditorRequest {
-    pub name: String,
-    pub editor_type: CodingEditorType,
-    pub rating: u8,
-    pub installed: bool,
-}
+#[tokio::test]
+async fn responds_with_400_when_nothing_is_passed_in() -> Result<()> {
+    let url = format!("{BASE_URL}/mirror");
+    let client = Client::new();
+    let response = client.post(url).send().await?;
+    let status = response.status();
+    let expected_status = 400;
 
-#[derive(serde::Serialize, serde::Deserialize)]
-enum CodingEditorType {
-    GUI,
-    TUI,
+    assert_eq!(status, expected_status);
+
+    Ok(())
 }

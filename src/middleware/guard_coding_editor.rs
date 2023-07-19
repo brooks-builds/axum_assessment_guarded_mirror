@@ -11,6 +11,7 @@ use axum::{
 };
 use hyper::body::{Bytes, HttpBody};
 use serde::de;
+use validator::Validate;
 
 pub async fn guard_coding_editor(
     request: Request<Body>,
@@ -41,6 +42,17 @@ pub async fn guard_coding_editor(
     let string_body = std::str::from_utf8(&*body).unwrap();
 
     tracing::debug!("we have the body????: {string_body}");
+    let coding_editor =
+        serde_json::from_str::<CodingEditorRequest>(string_body).map_err(|error| {
+            tracing::error!("Error converting body to json: {error}");
+            StatusCode::BAD_REQUEST
+        })?;
+
+    coding_editor.validate().map_err(|error| {
+        tracing::error!("Error validating: {error}");
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+    tracing::debug!("coding editor as a struct: {coding_editor:?}");
 
     // we consumed the body previously, we need to re-create it so that we can pass it along to the next route handler.
     // We are using the body which is Bytes to create this. It implements From<Bytes> so this just works.

@@ -39,3 +39,31 @@ async fn responds_with_400_when_nothing_is_passed_in() -> Result<()> {
 
     Ok(())
 }
+
+#[tokio::test]
+async fn not_guard_unrelated_route() -> Result<()> {
+    let url = format!("{BASE_URL}/unrelated");
+    let response = reqwest::get(url).await?;
+    let status = response.status();
+    let expected_status = 200;
+
+    assert_eq!(status, expected_status);
+    Ok(())
+}
+
+#[tokio::test]
+async fn responds_with_400_when_required_part_of_json_is_not_passed_in() -> Result<()> {
+    let url = format!("{BASE_URL}/mirror");
+    let client = Client::new();
+    let json = CodingEditorRequest {
+        name: Some("Helix".to_owned()),
+        ..Default::default()
+    };
+    let response = client.post(url).json(&json).send().await?;
+    let status = response.status();
+    let expected_status = 400;
+
+    assert_eq!(status, expected_status);
+
+    Ok(())
+}

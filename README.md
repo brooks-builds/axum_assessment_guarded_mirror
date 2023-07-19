@@ -26,12 +26,14 @@ To run the tests on their own run the command `cargo test`. This can help see wh
 
 A solution for this is on the Solution branch. You can check this out locally or view it on GitHub to see one way to solve the assessment and pass it
 
+The JSON being passed in is the [CodingEditor](src/types.rs) struct. You will need to write validation code to verify that the incomming json exists and is the correct type. 
+
 ## Rubric
 
 To pass this assessment the following needs to be done
 
-- task
-- task
+- Create middleware that will validate the CodingEditor object
+- Make sure the middleware is not validating on unrelated route
 - task
 - check.sh script is passing
 

@@ -33,7 +33,7 @@ The JSON being passed in is the [CodingEditor](src/types.rs) struct. You will ne
 To pass this assessment the following needs to be done
 
 - Create middleware that will validate the CodingEditor object
+  - If validation fails don't run route handlers and return 400 Status Code
 - Make sure the middleware is not validating on unrelated route
-- task
 - check.sh script is passing
 

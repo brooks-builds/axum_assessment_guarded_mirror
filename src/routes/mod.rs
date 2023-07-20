@@ -13,6 +13,7 @@ use unrelated::unrelated;
 pub fn create_router() -> Router {
     Router::new()
         .route("/unrelated", routing::get(unrelated))
+        // We are adding the guard middleware layer to the route handler itself rather than on the route chain. This is so we don't accidentally guard the wrong routes.
         .route(
             "/mirror",
             post(mirror).layer(middleware::from_fn(guard_coding_editor)),

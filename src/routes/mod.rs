@@ -1,9 +1,7 @@
 mod mirror;
 mod unrelated;
 
-use crate::middleware::guard_coding_editor::guard_coding_editor;
 use axum::{
-    middleware,
     routing::{self, post},
     Router,
 };
@@ -14,9 +12,6 @@ pub fn create_router() -> Router {
     Router::new()
         .route("/unrelated", routing::get(unrelated))
         // We are adding the guard middleware layer to the route handler itself rather than on the route chain. This is so we don't accidentally guard the wrong routes.
-        .route(
-            "/mirror",
-            post(mirror).layer(middleware::from_fn(guard_coding_editor)),
-        )
+        .route("/mirror", post(mirror))
         .layer(tower_http::trace::TraceLayer::new_for_http())
 }
